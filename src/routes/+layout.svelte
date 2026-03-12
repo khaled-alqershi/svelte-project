@@ -4,7 +4,7 @@
 </script>
 
 <nav>
-	<a href="/">Home</a>
+	<a href="/">Homepage</a>
 	<a href="/users">Users</a>
 </nav>
 
