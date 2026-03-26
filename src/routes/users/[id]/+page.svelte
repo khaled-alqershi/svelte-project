@@ -1,5 +1,5 @@
 <script lang="ts" >
-	import UserCard from "$lib/components/UserCard.svelte";
+	import UserCard from '../../../features/users/UserCard.svelte';
     import type { PageData } from './$types';
 
     let { data }: { data: PageData } = $props()

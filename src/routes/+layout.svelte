@@ -1,31 +1,18 @@
-<script>
+<script lang="ts">
+     
 	import './layout.css'
+	import Nav from '../features/layout/Nav.svelte';
+	import type { NavItem } from "$lib/types";
 	let { children } = $props();
+
+    const navLinks: NavItem[]=[
+		{ name:"Home", path:"/" },
+		{ name:"Users", path:"/users" },
+		{name:"Posts", path:"/posts"}
+	]
 </script>
 
-<nav>
-	<a href="/">Home</a>
-	<a href="/users">Users</a>
-</nav>
-
+<Nav items={navLinks} />
 
 {@render children()}
 
-<style>
-	nav {
-		display: flex;
-		gap: 1rem;
-		padding: 1rem;
-		border-bottom: 1px solid #970808;
-		background-color: black;
-	}
-
-	a {
-		text-decoration: none;
-		color: #f47886;
-	}
-
-	a:hover {
-		text-decoration: underline;
-	}
-</style>

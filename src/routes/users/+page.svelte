@@ -1,7 +1,8 @@
 <script lang="ts" >
     import type { PageData } from './$types';
-	import SearchBar from '$lib/components/SearchBar.svelte';
-    import UserCard from '$lib/components/UserCard.svelte';
+	import SearchBar from '../../features/common/SearchBar.svelte';
+	import UserCard from '../../features/users/UserCard.svelte';
+	import UserRow from '../../features/users/UserRow.svelte';
 
     let { data }: { data: PageData } = $props()
 
@@ -30,7 +31,28 @@
     {#if filteredUsers.length === 0}
         <p>No users found.</p>
     {/if}
-    {#each filteredUsers as user}
-        <UserCard user={user} />
-    {/each}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Website</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {#each filteredUsers as user}
+                <UserRow user={user} />
+            {/each}
+        </tbody>
+    </table>
 </ul>
+
+<style>
+    table {
+        border: 1px solid black;
+        padding: 10px;
+        border-radius: 5px;
+    }
+</style>
