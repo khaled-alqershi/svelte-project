@@ -8,7 +8,8 @@
     const navLinks: NavItem[]=[
 		{ name:"Home", path:"/" },
 		{ name:"Users", path:"/users" },
-		{name:"Posts", path:"/posts"}
+		{name:"Posts", path:"/posts"},
+		{ name: 'Test', path: '/test' }
 	]
 </script>
 
