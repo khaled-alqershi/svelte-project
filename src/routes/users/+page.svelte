@@ -1,58 +1,62 @@
-<script lang="ts" >
+<script lang="ts">
     import type { PageData } from './$types';
-	import SearchBar from '../../features/common/SearchBar.svelte';
-	import UserCard from '../../features/users/UserCard.svelte';
-	import UserRow from '../../features/users/UserRow.svelte';
+    import SearchBar from '../../features/common/SearchBar.svelte';
+    import UserRow from '../../features/users/UserRow.svelte';
+	import Loader from '../../features/common/Loader.svelte';
+	import Error500 from '../../features/common/Error500.svelte';
 
-    let { data }: { data: PageData } = $props()
-
-    let searchQuery = $state<string>('')
-
-    let filteredUsers = $derived(
-        data.users.filter((user) => {
-            const search = searchQuery.toLowerCase();
-            return (
-                user.name.toLowerCase().includes(search) ||
-                user.email.toLowerCase().includes(search)
-            )
-        })
-    )
-
+    let { data }: { data: PageData } = $props();
+    let searchQuery = $state<string>('');
 </script>
 
-<h1 class="font-bold text-xl p-2" >Users</h1>
+<h1 class="font-bold text-2xl p-4 text-[#620712]">Users</h1>
 
-<SearchBar 
-    placeholder="Search for users..."
-    bind:value={searchQuery}
-/>
+<div class="px-4 mb-4">
+    <SearchBar 
+        placeholder="Search users..."
+        bind:value={searchQuery}
+    />
+</div>
 
-<ul class="grid grid-cols-2 gap-4 p-2" >
-    {#if filteredUsers.length === 0}
-        <p>No users found.</p>
-    {/if}
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Website</th>
-                <th>Phone</th>
-            </tr>
-        </thead>
-        <tbody>
-            {#each filteredUsers as user}
-                <UserRow user={user} />
-            {/each}
-        </tbody>
-    </table>
-</ul>
+{#await data.responsePromise}
+    <Loader />
+
+{:then users}
+    {@const filteredUsers = users.filter(u => 
+        u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        u.email.toLowerCase().includes(searchQuery.toLowerCase())
+    )}
+
+    <div class="p-4 overflow-x-auto">
+        {#if filteredUsers.length === 0}
+            <p class="p-4 bg-gray-100 rounded">No users found for "{searchQuery}"</p>
+        {:else}
+            <table class="min-w-full bg-white border border-black rounded-lg">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-2 border-b">ID</th>
+                        <th class="p-2 border-b">Name</th>
+                        <th class="p-2 border-b">Email</th>
+                        <th class="p-2 border-b">Website</th>
+                        <th class="p-2 border-b">Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each filteredUsers as user (user.id)}
+                        <UserRow {user} />
+                    {/each}
+                </tbody>
+            </table>
+        {/if}
+    </div>
+
+{:catch error}
+    <Error500 error={error} />
+{/await}
 
 <style>
     table {
-        border: 1px solid black;
-        padding: 10px;
-        border-radius: 5px;
+        width: 100%;
+        border-collapse: collapse;
     }
 </style>

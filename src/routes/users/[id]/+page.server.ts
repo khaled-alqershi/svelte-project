@@ -1,17 +1,15 @@
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types'; 
 import type { User } from '$lib/types';
 import { PUBLIC_API_URL } from '$env/static/public';
 
 export const load: PageServerLoad = async ({ fetch, params }) => {
     
-    const response = await fetch(PUBLIC_API_URL + `/users/${params.id}`);
+    const responsePromise = fetch(PUBLIC_API_URL + `/users/${params.id}`).then(response =>{
+        if (!response.ok ) {
+            throw new Error()
+        }
+        return response.json() as Promise<User>;
+    } ) 
 
-    if (!response.ok) {
-        throw error(404, 'User not found')  
-        // return { success: false, error: "User not found!" }
-    }
-
-    const user: User = await response.json();
-    return { success: true, user };
+    return { responsePromise };
 };
