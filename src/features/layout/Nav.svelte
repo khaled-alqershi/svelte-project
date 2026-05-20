@@ -1,30 +1,22 @@
 <script lang="ts">
-    import type { NavItem } from "$lib/types";
-    export let items: NavItem[]=[];
+	import { page } from "$app/stores";
+	import type { NavItem } from "$lib/types";
+
+	let { items = [] }: { items: NavItem[] } = $props();
 </script>
 
-<nav class="flex items-center gap-4 p-4" >
-    {#each items as item }
-        <a href={item.path}>{item.name}</a>
-        
-    {/each}
-</nav>
-<style>
-	nav {
+<nav class="space-y-1 px-4">
+	{#each items as item}
+		{@const isActive = $page.url.pathname === item.path || ($page.url.pathname.startsWith(item.path) && item.path !== "/")}
 		
-		display: flex;
-		gap: 1rem;
-		padding: 1rem;
-		border-bottom: 1px solid #970808;
-		background-color: black;
-	}
-
-	a {
-		text-decoration: none;
-		color: #f47886;
-	}
-
-	a:hover {
-		text-decoration: underline;
-	}
-</style>
+		<a
+			href={item.path}
+			class="flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-all duration-200
+			{isActive 
+				? 'bg-foreground text-background font-semibold shadow-sm' 
+				: 'text-muted-foreground hover:text-foreground hover:bg-muted'}"
+		>
+			{item.name}
+		</a>
+	{/each}
+</nav>

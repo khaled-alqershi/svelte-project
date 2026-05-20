@@ -1,62 +1,82 @@
 <script lang="ts">
-    import type { PageData } from './$types';
-    import SearchBar from '../../features/common/SearchBar.svelte';
-    import UserRow from '../../features/users/UserRow.svelte';
+	import type { PageData } from './$types';
+	import SearchBar from '../../features/common/SearchBar.svelte';
 	import Loader from '../../features/common/Loader.svelte';
 	import Error500 from '../../features/common/Error500.svelte';
+	import UserTable from '../../features/users/UserTable.svelte';
+	import StatsCard from "$lib/components/StatsCard.svelte";
 
-    let { data }: { data: PageData } = $props();
-    let searchQuery = $state<string>('');
+	
+	let { data }: { data: PageData } = $props();
+	let searchQuery = $state<string>('');
 </script>
 
-<h1 class="font-bold text-2xl p-4 text-[#620712]">Users</h1>
 
-<div class="px-4 mb-4">
-    <SearchBar 
-        placeholder="Search users..."
-        bind:value={searchQuery}
-    />
+<div class="p-4 pb-2">
+	<h1 class="font-bold text-3xl tracking-tight text-[#620712]">Users Dashboard</h1>
+	<p class="text-sm text-muted-foreground mt-1">active user accounts in the system.</p>
+</div>
+
+
+<div class="px-4 mb-6">
+	<SearchBar 
+		placeholder="Search users by name or email..."
+		bind:value={searchQuery}
+	/>
 </div>
 
 {#await data.responsePromise}
-    <Loader />
+	
+	<div class="p-4">
+		<Loader />
+	</div>
 
 {:then users}
-    {@const filteredUsers = users.filter(u => 
-        u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        u.email.toLowerCase().includes(searchQuery.toLowerCase())
-    )}
+	
+	{@const filteredUsers = users.filter(u => 
+		u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+		u.email.toLowerCase().includes(searchQuery.toLowerCase())
+	)}
 
-    <div class="p-4 overflow-x-auto">
-        {#if filteredUsers.length === 0}
-            <p class="p-4 bg-gray-100 rounded">No users found for "{searchQuery}"</p>
-        {:else}
-            <table class="min-w-full bg-white border border-black rounded-lg">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-2 border-b">ID</th>
-                        <th class="p-2 border-b">Name</th>
-                        <th class="p-2 border-b">Email</th>
-                        <th class="p-2 border-b">Website</th>
-                        <th class="p-2 border-b">Phone</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each filteredUsers as user (user.id)}
-                        <UserRow {user} />
-                    {/each}
-                </tbody>
-            </table>
-        {/if}
-    </div>
+	
+	<div class="px-4 space-y-6">
+		
+		
+		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<StatsCard 
+				title="Total users" 
+				value={users.length.toString()} 
+				description="Total number in the database " 
+			/>
+			<StatsCard 
+				title="Current search results " 
+				value={filteredUsers.length.toString()} 
+				description="  Number of users matching current filters  " 
+			/>
+			<StatsCard 
+				title="State" 
+				value="Active" 
+				description="The data was successfullt updated from the API" 
+			/>
+		</div>
+
+		
+		<div class="overflow-x-auto pt-2">
+			{#if filteredUsers.length === 0}
+				<div class="p-8 text-center border border-dashed rounded-xl bg-muted/30">
+					<p class="text-muted-foreground font-medium">No users found for "{searchQuery}"</p>
+				</div>
+			{:else}
+				
+				<UserTable users={filteredUsers} />
+			{/if}
+		</div>
+
+	</div>
 
 {:catch error}
-    <Error500 error={error} />
+	
+	<div class="p-4">
+		<Error500 error={error} />
+	</div>
 {/await}
-
-<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-</style>
